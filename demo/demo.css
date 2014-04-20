@@ -1,0 +1,49 @@
+
+body {
+  font-size: 16px;
+  font-family: sans-serif;
+}
+
+.wrapper {
+  background: #fff;
+  position: absolute;
+  height: calc(100% - 36px);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 18px;
+}
+
+.page {
+  box-sizing: border-box;
+  position: relative;
+  padding: 30px;
+  background: #f6f5f3;
+  height: 100%;
+}
+
+.status-box {
+  text-align: right;
+}
+
+.status {
+  display: inline-block;
+  color: #888;
+  border-top: 3px solid #888;
+  padding: 5px 8px 5px 8px;
+}
+
+.status-connected {
+  color: #5a5;
+  border-color: #5a5;
+}
+
+.status-error {
+  color: #a55;
+  border-color: #a55;
+}
+
+.content {
+  margin-top: 25px;
+}
