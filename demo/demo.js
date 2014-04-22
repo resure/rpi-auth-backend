@@ -29,7 +29,7 @@ $(function () {
       $status.removeClass('status-error');
       $status.addClass('status-connected');
       $status.text('Соединение установлено');
-      ws.send('ping');
+      ws.send('pong');
     };
 
     ws.onclose = function (error) {
@@ -50,3 +50,13 @@ $(function () {
     };
   }(wsLocation));
 });
+
+
+function requestConfirm(text) {
+  // TODO
+}
+
+function verifyTOTP() {
+  // TODO
+}
+
