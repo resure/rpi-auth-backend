@@ -5,22 +5,23 @@ body {
 }
 
 .wrapper {
-  background: #fff;
   position: absolute;
-  height: calc(100% - 36px);
+  height: 100%;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 18px;
+  box-sizing: border-box;
+  background: #f6f5f3;
+  border: 18px solid #fff;
 }
 
 .page {
-  box-sizing: border-box;
   position: relative;
+  box-sizing: border-box;
+  height: 100%;
   padding: 30px;
   background: #f6f5f3;
-  height: 100%;
 }
 
 .status-box {
