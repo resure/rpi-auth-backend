@@ -53,6 +53,12 @@ wss.on('connection', function (ws) {
                 broadcast(wss, {action: 'unlock'});
                 status = 'idle';
             });
+        } else if (message.action == 'verifyTOTP') {
+            var result = verifyTOTP(message.code);
+            console.log('Input code:', message.code);
+            console.log('Correct code:', totp.gen(config.key, { opt: 30 }));
+            console.log('Result:', result);
+            send(ws, {action: 'verifyResult', result: result});
         }
     });
 });
@@ -92,7 +98,7 @@ function unlockInterface() {
 }
 
 function verifyTOTP(code) {
-  return totp.verify(config.token, code, { time: 30 });
+  return code == totp.gen(config.key, { time: 30 });
 }
 
 // function redisKey(key) {

@@ -20,15 +20,22 @@
     </div>
 
     <div class="content">
-      <div class="totp-verify">
-        TODO: totp-verify
+      <h1>Демонстрационное приложение</h1>
+      <div class="block totp-verify">
+        <h2>Двухфакторная аутентификация</h1>
+        <input class="totp-verify-input" placeholder="Введите код">
+        <button class="totp-verify-action">Валидация</button>
+        <div class="totp-verify-result"></div>
       </div>
 
-      <div class="try-password">
-        TODO: try-password
+      <div class="block alert-button-wrapper">
+        <h2>Неавторизованный доступ</h1>
+        <button class="alert-button">Отправить запрос</button>
+        <p>Нажатие на эту кнопку приведет к попытке исполнения служебной
+        серверной команды с использованием неправильного токена доступа.</p>
       </div>
 
-      <div class="request-confirm">
+      <div class="block request-confirm">
         TODO: request-confirm
       </div>
     </div>

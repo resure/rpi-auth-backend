@@ -11,19 +11,39 @@ function tryPassword(password) {
   // TODO
 }
 
+function send(data) {
+    data = JSON.stringify(data);
+    window.ws.send(data);
+}
+
 $(function () {
   var $status = $('.status');
   var $lock = $('.lock');
+  var $verifyAction = $('.totp-verify-action');
+  var $verifyResult = $('.totp-verify-result');
   var wsLocation = "ws://localhost:3232";
   var wsTimerId = 0;
 
+  $('.totp-verify-action').on('click', verifyTOTP);
+  $('.totp-verify-input')
+    .on('keypress', function (e) {
+      if (e.which == 13) {
+          verifyTOTP();
+      }
+    })
+    .on('input', function () {
+      $verifyResult.html('');
+      $verifyResult.removeClass('verifySuccess verifyFailure');
+    });
+
+
+  var verifyTOTP = function () {
+      var code = $('.totp-verify-input').val();
+      send({action: 'verifyTOTP', code: code});
+  };
+
   (function wsInit(wsLocation) {
     window.ws = new WebSocket(wsLocation);
-
-    function send(data) {
-        data = JSON.stringify(data);
-        window.ws.send(data);
-    }
 
     ws.onopen = function () {
       if (wsTimerId) {
@@ -62,17 +82,18 @@ $(function () {
         } else if (data.action == 'unlock') {
             $lock.hide();
             console.log('Unlock action initiated');
+        } else if (data.action == 'verifyResult') {
+            if (data.result) {
+                $verifyResult.html('Временный пароль введен верно');
+                $verifyResult.removeClass('verifySuccess verifyFailure');
+                $verifyResult.addClass('verifySuccess');
+            } else {
+                $verifyResult.html('Временный пароль не верен');
+                $verifyResult.removeClass('verifySuccess verifyFailure');
+                $verifyResult.addClass('verifyFailure');
+            }
         }
     };
   }(wsLocation));
 });
-
-
-function requestConfirm(text) {
-  // TODO
-}
-
-function verifyTOTP() {
-  // TODO
-}
 
