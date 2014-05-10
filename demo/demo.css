@@ -4,6 +4,33 @@ body {
   font-family: sans-serif;
 }
 
+.lock {
+  display: none;
+  vertical-align: middle; 
+  z-index: 10;
+
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+
+  background: #333;
+  color: #fff;
+  text-align: center;
+  font-size: 40px;
+}
+
+.lock > div {
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  margin-top: -30px;
+}
+
 .wrapper {
   position: absolute;
   height: 100%;

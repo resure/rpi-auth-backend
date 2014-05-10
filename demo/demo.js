@@ -13,11 +13,17 @@ function tryPassword(password) {
 
 $(function () {
   var $status = $('.status');
-  var wsLocation = "ws://localhost:8080";
+  var $lock = $('.lock');
+  var wsLocation = "ws://localhost:3232";
   var wsTimerId = 0;
 
   (function wsInit(wsLocation) {
     window.ws = new WebSocket(wsLocation);
+
+    function send(data) {
+        data = JSON.stringify(data);
+        window.ws.send(data);
+    }
 
     ws.onopen = function () {
       if (wsTimerId) {
@@ -29,7 +35,7 @@ $(function () {
       $status.removeClass('status-error');
       $status.addClass('status-connected');
       $status.text('Соединение установлено');
-      ws.send('pong');
+      send({action: 'ping'});
     };
 
     ws.onclose = function (error) {
@@ -45,8 +51,18 @@ $(function () {
       }
     };
 
-    ws.onmessage = function (e) {
-      // TODO
+    ws.onmessage = function (msg) {
+        var data = JSON.parse(msg.data);
+        
+        if (data.action == 'ping') {
+            console.log('received:', data);
+        } else if (data.action == 'lock') {
+            console.log('Lock action initiated');
+            $lock.show();
+        } else if (data.action == 'unlock') {
+            $lock.hide();
+            console.log('Unlock action initiated');
+        }
     };
   }(wsLocation));
 });

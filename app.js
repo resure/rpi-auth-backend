@@ -1,6 +1,7 @@
 
 var config  = require('./config'),
-    totp    = require('notp').totp;
+    totp    = require('notp').totp,
+    status = 'idle';
 
 config.redisPrefix = config.redisPrefix || 'rpi-auth-backend-';
 config.wsPort = config.wsPort || 8080;
@@ -8,14 +9,16 @@ config.wsPort = config.wsPort || 8080;
 
 // Redis ----------------------------------------------------------------------
 
-var Redis = require("redis"),
-    redis = Redis.createClient();
+// var Redis = require("redis"),
+//     redis = Redis.createClient();
 
-redis.on("error", function (err) {
-  console.error("Redis:", err);
-});
+// redis.on("error", function (err) {
+//   console.error("Redis:", err);
+// });
 
-redis.set(redisKey('status'), 'idle');
+// setTimeout(function () {
+//     setStatus('idle');
+// }, 75);
 
 
 // WebSocket server -----------------------------------------------------------
@@ -25,15 +28,56 @@ var WebSocketServer = require('ws').Server,
 
 wss.on('connection', function (ws) {
 
-  ws.on('message', function (message) {
-    console.log('received: %s', message);
-  });
+    if (status === 'locked') {
+        send(ws, {action: 'lock'});
+    }
 
-  ws.send('ping');
+    ws.on('message', function (message) {
+        try {
+            message = JSON.parse(message);
+            console.log('received:', message);
+        } catch(e) {
+            console.log('parse error:', e);
+            return;
+        }
+
+        if (message.action == 'ping') {
+            send(ws, {action: 'pong'});
+        } else if (message.action == 'lock') {
+            ensureAuth(message.__token, function () {
+                broadcast(wss, {action: 'lock'});
+                status = 'locked';
+            });
+        } else if (message.action == 'unlock') {
+            ensureAuth(message.__token, function () {
+                broadcast(wss, {action: 'unlock'});
+                status = 'idle';
+            });
+        }
+    });
 });
 
 
 // Helpers --------------------------------------------------------------------
+
+function ensureAuth(token, fun) {
+    if (token === config.key) {
+        fun();
+    }
+}
+
+function send(ws, data) {
+    data = JSON.stringify(data);
+    ws.send(data);
+}
+
+function broadcast(wss, data) {
+    data = JSON.stringify(data);
+
+    wss.clients.forEach(function (client) {
+        client.send(data);
+    });
+}
 
 function requestConfirm(name) {
   // TODO
@@ -51,7 +95,7 @@ function verifyTOTP(code) {
   return totp.verify(config.token, code, { time: 30 });
 }
 
-function redisKey(key) {
-  return config.redisPrefix + key;
-}
+// function redisKey(key) {
+//   return config.redisPrefix + key;
+// }
 

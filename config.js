@@ -1,5 +1,6 @@
 
 module.exports = exports = {
-  key: 'foobar'
+  key: 'foobar',
+  wsPort: 3232
 };
 
