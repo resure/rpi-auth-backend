@@ -41,25 +41,44 @@ wss.on('connection', function (ws) {
             return;
         }
 
+        if (status == 'locked' && message.action != 'unlock') {
+            broadcast(wss, {action: 'unauthorized'});
+            return;
+        }
+
         if (message.action == 'ping') {
             send(ws, {action: 'pong'});
+
         } else if (message.action == 'lock') {
             ensureAuth(message.__token, function () {
                 broadcast(wss, {action: 'lock'});
                 status = 'locked';
             });
+
         } else if (message.action == 'unlock') {
             ensureAuth(message.__token, function () {
                 broadcast(wss, {action: 'unlock'});
                 status = 'idle';
             });
+
         } else if (message.action == 'verifyTOTP') {
             var result = verifyTOTP(message.code);
-            console.log('Input code:', message.code);
-            console.log('Correct code:', totp.gen(config.key, { opt: 30 }));
-            console.log('Result:', result);
             send(ws, {action: 'verifyResult', result: result});
+
+        } else if (message.action == 'confirm') {
+            broadcast(wss, {action: 'confirm', name: message.name});
+
+        } else if (message.action == 'confirmResult') {
+            broadcast(wss, {
+                action: 'confirmResult',
+                name: message.name,
+                result: message.result
+            });
+            // Here we need to save message.name and result
+            // to allow request originator to do something
         }
+
+        // TODO: replace broadcast with RPi client object
     });
 });
 
@@ -69,6 +88,8 @@ wss.on('connection', function (ws) {
 function ensureAuth(token, fun) {
     if (token === config.key) {
         fun();
+    } else {
+        broadcast(wss, {action: 'unauthorized'});
     }
 }
 
